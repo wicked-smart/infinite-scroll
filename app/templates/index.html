@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Implementing scroll thing</title>
+    <style>
+        @keyframes hide {
+          0% {
+            opacoty: 1;
+          }
+
+          100% {
+            opacity: 0;
+          }
+        }
+            .post {
+                background-color: #77dd11;
+                padding: 20px;
+                margin: 10px;
+                animation-name: hide;
+                animation-duration: 2s;
+                animation-fill-mode: forwards;
+                animation-play-state: paused;
+
+            }
+
+            body {
+                padding-bottom: 50px;
+            }
+
+            .hide{
+              float: right;
+
+            }
+    </style>
+    <script>
+        let counter = 1;
+
+        const quantity = 20;
+
+        document.addEventListener('DOMContentLoaded', load);
+
+        window.onscroll = () => {
+          if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+            load();
+        }
+      };
+
+      //remove after hide button is clicked
+      document.addEventListener('click', event => {
+        const element = event.target;
+        if(element.className === 'hide'){
+          element.parentElement.style.animationPlayState = 'running';
+          element.parentElement.addEventListener('animationend', () => {
+            element.parentElement.remove();
+          });
+        }
+      });
+
+        function load(){
+            const start = counter;
+            const end = start + quantity -1;
+
+            counter = end + 1;
+
+            fetch(`/posts?start=${start}&end=${end}`)
+            .then(response => response.text())
+            .then(data => {
+                const foo = data.split(' ')
+                foo.forEach(add_post);
+            })
+        };
+
+        function add_post(contents){
+          const post = document.createElement('div');
+          post.className = 'post';
+          //post.style.backgroundColor = "green";
+          post.innerHTML = `${contents} <button class="hide">Hide</button>`;
+
+          document.querySelector('#posts').append(post);
+        };
+
+    </script>
+  </head>
+
+  <body>
+      <div id="posts"></div>
+  </body>
+
+</html>
